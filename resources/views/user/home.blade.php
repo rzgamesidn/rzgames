@@ -20,13 +20,13 @@
         }
     </style>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+@vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="bg-gray-950 text-white antialiased">
 
-{{-- NAVBAR --}}
+{{-- NAVBAR FIXED --}}
 <nav class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 w-full">
     <div class="w-full px-4 md:px-10 h-20 flex justify-between items-center">
         
@@ -41,76 +41,66 @@
         </div>
         
         {{-- SISI KANAN: MENU --}}
-<div class="flex items-center gap-2 md:gap-8">
-    {{-- Kita hapus 'hidden lg:flex' biar dia muncul di semua layar --}}
-    {{-- Kita pake 'flex' aja dan 'gap-3' biar nggak terlalu rapet di HP --}}
-    <div class="flex gap-3 md:gap-8 text-xs font-bold uppercase tracking-widest text-gray-400 items-center">
-        
-        {{-- Search Bar (Kita sembunyiin di HP biar gak sempit, atau biarin kecil) --}}
-        <form action="/search" method="GET" class="relative group hidden sm:block"> 
-            <input type="text" name="query" placeholder="Search..." 
-                   class="bg-gray-800 border-none rounded-full px-4 py-1.5 text-[10px] w-20 focus:w-32 transition-all outline-none">
-        </form>
+        <div class="flex items-center gap-3 md:gap-8">
+            <div class="flex gap-4 md:gap-8 text-xs font-bold uppercase tracking-widest text-gray-400 items-center">
+                
+                {{-- Search Bar --}}
+                <form action="/search" method="GET" class="relative group hidden lg:block">
+                    <input type="text" name="query" placeholder="Search..." value="{{ request('query') }}"
+                           class="bg-gray-800 border-none rounded-full px-4 py-1.5 text-[10px] w-32 focus:w-48 transition-all outline-none text-white">
+                </form>
 
-        {{-- Keranjang --}}
-        <a href="{{ route('cart.index') }}" class="hover:text-blue-500 transition flex items-center group relative">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 group-hover:scale-110">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-            </svg>
-            <span class="hidden md:block">Keranjang</span> {{-- Teksnya ilangin di HP, icon aja --}}
-            {{-- Badge jumlah barang tetep muncul --}}
-            @if($cartCount > 0)
-                <span class="absolute -top-2 -right-2 px-1.5 py-0.5 bg-blue-600 text-white rounded-full text-[8px] font-black">{{ $cartCount }}</span>
-            @endif
-        </a>
+                {{-- Keranjang --}}
+                @php 
+                    $cCount = auth()->check() ? \App\Models\Cart::where('user_id', auth()->id())->count() : count(session('cart', []));
+                @endphp
+                <a href="{{ route('cart.index') }}" class="hover:text-blue-500 transition flex items-center group relative">
+                    <i class="fa-solid fa-cart-shopping text-lg md:text-base"></i>
+                    <span class="hidden md:block ml-2">Keranjang</span> 
+                    @if($cCount > 0)
+                        <span class="absolute -top-2 -right-2 md:static md:ml-2 px-2 py-0.5 bg-blue-600 text-white rounded-full text-[10px] font-black">{{ $cCount }}</span>
+                    @endif
+                </a>
 
-        {{-- Favorit --}}
-        <a href="{{ route('favorite.index') }}" class="flex items-center gap-2 hover:text-red-500 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-            </svg>
-            <span class="hidden md:block">Favorit</span>
-        </a>
+                {{-- Favorit --}}
+                <a href="{{ route('favorite.index') }}" class="flex items-center hover:text-red-500 transition">
+                    <i class="fa-solid fa-heart text-lg md:text-base"></i>
+                    <span class="hidden md:block ml-2">Favorit</span>
+                </a>
 
-        {{-- History --}}
-        @auth
-            <a href="{{ route('order.history') }}" class="flex items-center gap-2 hover:text-blue-500 transition">
-                <span class="text-sm">📜</span> 
-                <span class="hidden md:block">History</span>
-            </a>
-        @endauth
-    </div>
+                @auth
+                    {{-- History --}}
+                    <a href="{{ route('order.history') }}" class="flex items-center hover:text-blue-500 transition">
+                        <i class="fa-solid fa-clock-rotate-left text-lg md:text-base"></i>
+                        <span class="hidden md:block ml-2">History</span>
+                    </a>
                 @endauth
             </div>
             
             {{-- Auth Buttons --}}
-            <div class="flex items-center gap-4 ml-4">
+            <div class="flex items-center gap-2">
                 @auth
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3">
                         @if(Auth::user()->role === 'admin')
-                            <a href="{{ route('admin.dashboard') }}" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl text-[10px] font-black transition shadow-lg shadow-red-500/30">
-                                ADMIN PANEL
-                            </a>
-                        @else
-                            <span class="hidden sm:block text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                Hi, {{ Auth::user()->name }}
-                            </span>
+                            <a href="{{ route('admin.dashboard') }}" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase shadow-lg shadow-red-500/20">ADMIN</a>
                         @endif
-
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="text-[10px] font-bold text-red-500 hover:text-red-400 uppercase tracking-widest">Logout</button>
                         </form>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition">Login</a>
-                    <a href="{{ route('register') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl text-sm font-black transition shadow-lg shadow-blue-500/30">JOIN NOW</a>
+                    <div class="flex items-center gap-4">
+                        <a href="{{ route('login') }}" class="text-[10px] font-bold uppercase text-gray-400 hover:text-white transition">Login</a>
+                        <a href="{{ route('register') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-[10px] font-black transition shadow-lg shadow-blue-500/30">JOIN NOW</a>
+                    </div>
                 @endauth
             </div>
         </div>
     </div>
 </nav>
 
+{{-- KONTEN UTAMA --}}
 @if(!request('query'))
 <div class="max-w-[1800px] mx-auto px-6 mt-8 mb-12">
     <div class="w-full h-[200px] md:h-[400px] relative overflow-hidden rounded-[2.5rem] shadow-2xl border border-gray-800 group">
