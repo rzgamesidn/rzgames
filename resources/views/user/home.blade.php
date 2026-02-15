@@ -41,49 +41,45 @@
         </div>
         
         {{-- SISI KANAN: MENU --}}
-        <div class="flex items-center gap-4 md:gap-8">
-            <div class="hidden lg:flex gap-8 text-xs font-bold uppercase tracking-widest text-gray-400 items-center">
-                
-                {{-- Search Bar --}}
-                <form action="/search" method="GET" class="relative group">
-                    <input type="text" name="query" placeholder="Search Game..." value="{{ request('query') }}"
-                           class="bg-gray-800 border-none rounded-full px-4 py-1.5 text-[10px] w-32 focus:w-48 focus:ring-1 focus:ring-blue-500 transition-all duration-300 outline-none">
-                    <button type="submit" class="absolute right-3 top-2 hover:text-blue-500 transition">🔍</button>
-                </form>
+<div class="flex items-center gap-2 md:gap-8">
+    {{-- Kita hapus 'hidden lg:flex' biar dia muncul di semua layar --}}
+    {{-- Kita pake 'flex' aja dan 'gap-3' biar nggak terlalu rapet di HP --}}
+    <div class="flex gap-3 md:gap-8 text-xs font-bold uppercase tracking-widest text-gray-400 items-center">
+        
+        {{-- Search Bar (Kita sembunyiin di HP biar gak sempit, atau biarin kecil) --}}
+        <form action="/search" method="GET" class="relative group hidden sm:block"> 
+            <input type="text" name="query" placeholder="Search..." 
+                   class="bg-gray-800 border-none rounded-full px-4 py-1.5 text-[10px] w-20 focus:w-32 transition-all outline-none">
+        </form>
 
-                {{-- Keranjang (Tamu & User Bisa Lihat) --}}
-                <a href="{{ route('cart.index') }}" class="hover:text-blue-500 transition flex items-center group relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                    </svg>
-                    <span class="font-bold text-xs tracking-widest uppercase">Keranjang</span> 
-                    @php 
-                        // Logic Hitung: Jika Login cek DB, Jika Tamu cek Session
-                        if(auth()->check()) {
-                            $cartCount = \App\Models\Cart::where('user_id', auth()->id())->count(); 
-                        } else {
-                            $cartCount = count(session('cart', []));
-                        }
-                    @endphp
-                    @if($cartCount > 0)
-                        <span class="ml-2 px-2 py-0.5 bg-blue-600 text-white rounded-full text-[10px] font-black animate-pulse">{{ $cartCount }}</span>
-                    @endif
-                </a>
+        {{-- Keranjang --}}
+        <a href="{{ route('cart.index') }}" class="hover:text-blue-500 transition flex items-center group relative">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 group-hover:scale-110">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+            </svg>
+            <span class="hidden md:block">Keranjang</span> {{-- Teksnya ilangin di HP, icon aja --}}
+            {{-- Badge jumlah barang tetep muncul --}}
+            @if($cartCount > 0)
+                <span class="absolute -top-2 -right-2 px-1.5 py-0.5 bg-blue-600 text-white rounded-full text-[8px] font-black">{{ $cartCount }}</span>
+            @endif
+        </a>
 
-                {{-- Favorit (Tamu & User Bisa Lihat) --}}
-                <a href="{{ route('favorite.index') }}" class="flex items-center gap-2 hover:text-red-500 transition relative group">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 group-hover:fill-red-500 transition-all duration-300">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                    </svg>
-                    <span class="font-bold text-xs tracking-widest uppercase">Favorit</span>
-                </a>
+        {{-- Favorit --}}
+        <a href="{{ route('favorite.index') }}" class="flex items-center gap-2 hover:text-red-500 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+            <span class="hidden md:block">Favorit</span>
+        </a>
 
-                @auth
-                    {{-- History (Hanya User) --}}
-                    <a href="{{ route('order.history') }}" class="flex items-center gap-2 hover:text-blue-500 transition">
-                        <span class="text-sm">📜</span> 
-                        <span class="font-bold text-xs tracking-widest uppercase">History</span>
-                    </a>
+        {{-- History --}}
+        @auth
+            <a href="{{ route('order.history') }}" class="flex items-center gap-2 hover:text-blue-500 transition">
+                <span class="text-sm">📜</span> 
+                <span class="hidden md:block">History</span>
+            </a>
+        @endauth
+    </div>
                 @endauth
             </div>
             
